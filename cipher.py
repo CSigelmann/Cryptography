@@ -6,17 +6,15 @@ ARG_CIPHER_TYPE = 1
 ARG_TEXT = 4
 ARG_ADDITIVE_KEY = 3
 ARG_MULTIPLICATIVE_KEY = 2
-multiplicative_inverses = {1: 1, 3: 9, 5: 21, 7: 15, 9: 3, 11: 19, 15: 7, 17: 23, 19: 11, 21: 23, 25: 25}
+multiplicative_inverses = {1: 1, 3: 9, 5: 21, 7: 15, 9: 3, 11: 19, 15: 7, 17: 23, 19: 11, 21: 23, 23: 17, 25: 25}
 alphabet_to_int = {}
 int_to_alphabet = {}
-usage = "Usage: python cipher.py <cipher_type> <multiplicative_key> <additive_key> <text>\n" \
+usage = "Usage: python cipher.py <cipher_type> [<multiplicative_key> <additive_key>] <text>\n" \
         "Options for cypher_type:\n" \
         "    encipher_affine\n" \
         "    decipher_affine\n"
-
-if len(sys.argv) != 5:
-    print usage
-    exit()
+affine_usage = "Usage for *_affine: python cipher.py encipher_affine <multiplicative_key> <additive_key> <text>"
+print_all_usage = "Usage for print_all_affine: python cipher.py print_all_affine <text>"
 
 # Initialize alphabet_mapping by converting characters to numerical representations.
 # Iterate over lowercase characters.
@@ -79,6 +77,23 @@ def decipher_affine(multiplicative_key, additive_key, text):
         current_plain_text += int_to_alphabet[char_rep]
     return current_plain_text
 
+
+##
+# print_all_affine
+#
+# Description: Prints the results of decrypting an affine cipher for all possible keys.
+#
+# Parameters:
+#     text - The cipher text to be deciphered
+##
+def print_all_affine(text):
+    for s in range(1, 26, 2):
+        if s == 13:
+            continue
+        for r in range(0, 26):
+            print decipher_affine(s, r, text), s, r, "\n"
+            
+
 ############################################
 #             CODE EXECUTION               #
 ############################################
@@ -86,19 +101,28 @@ def decipher_affine(multiplicative_key, additive_key, text):
 
 # decide which cipher to use
 if sys.argv[ARG_CIPHER_TYPE] == "encipher_affine":
+    if len(sys.argv) != 5:
+        print affine_usage
+        exit()
     mKey = int(sys.argv[ARG_MULTIPLICATIVE_KEY])
     aKey = int(sys.argv[ARG_ADDITIVE_KEY])
-    plain_text = sys.argv[ARG_TEXT]
+    plain_text = sys.argv[ARG_TEXT].lower()
     output_text = encipher_affine(mKey, aKey, plain_text)
+    print "Output Text: ", output_text
 elif sys.argv[ARG_CIPHER_TYPE] == "decipher_affine":
+    if len(sys.argv) != 5:
+        print affine_usage
+        exit()
     mKey = int(sys.argv[ARG_MULTIPLICATIVE_KEY])
     aKey = int(sys.argv[ARG_ADDITIVE_KEY])
-    cipher_text = sys.argv[ARG_TEXT]
+    cipher_text = sys.argv[ARG_TEXT].lower()
     output_text = decipher_affine(mKey, aKey, cipher_text)
+    print "Output Text: ", output_text
+elif sys.argv[ARG_CIPHER_TYPE] == "print_all_affine":
+    if len(sys.argv) != 3:
+        print print_all_usage
+        exit()
+    print_all_affine(sys.argv[2].lower())
 else:
     print usage
     exit()
-
-print "Output Text: ", output_text
-
-
